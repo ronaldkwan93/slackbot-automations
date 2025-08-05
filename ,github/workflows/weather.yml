@@ -1,0 +1,29 @@
+name: Daily Slack Weather Bot
+
+on:
+  schedule:
+    # Runs every day at 7 AM Sydney time (UTC+10 or +11 DST)
+    - cron: "0 20 * * *"  # 7 AM AEST = 20:00 UTC (adjust if DST)
+  workflow_dispatch:  # allows manual trigger
+
+jobs:
+  send-weather:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run weather bot
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          USER_ID: ${{secrets.USER_ID}}
+        run: python bot.py
